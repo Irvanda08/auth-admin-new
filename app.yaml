@@ -1,2 +1,2 @@
 runtime: nodejs18
-service: -auth-baru
+service: auth-baru
