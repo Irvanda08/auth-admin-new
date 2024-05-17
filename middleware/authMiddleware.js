@@ -1,16 +1,16 @@
+// authController.js
 const jwt = require('jsonwebtoken');
 
-module.exports = function(req, res, next) {
-  const token = req.header('Authorization');
-  if (!token) return res.status(401).send('Access Denied');
+const login = (req, res) => {
+    const { username, password } = req.body;
 
-  try {
-    const tokenWithoutBearer = token.split(' ')[1];
-    const verified = jwt.verify(tokenWithoutBearer, 'secretkey');
-    req.admin = verified;
-    next();
-  } catch (err) {
-    console.error('Token Error : ', err);
-    return res.status(403).send('Access denied, invalid token');
-  }
+    // Validasi user dan password disini
+    if (username === 'admin' && password === 'password') {
+        const token = jwt.sign({ username }, 'your_secret_key', { expiresIn: '1h' });
+        res.json({ token });
+    } else {
+        res.status(401).json({ message: 'Invalid credentials' });
+    }
 };
+
+module.exports = { login };
