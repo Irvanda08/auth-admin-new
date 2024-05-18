@@ -4,7 +4,7 @@ const dbConn = mysql.createConnection({
   host: "34.101.146.156",
   user: "root",
   password: "",
-  database: "RECOVER_YOUR_DATA",
+  database: "ktp-cc",
 });
 
 dbConn.connect((err) => {
