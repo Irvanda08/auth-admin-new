@@ -7,21 +7,12 @@ const Admin = function (admin) {
 };
 
 Admin.create = (newAdmin, result) => {
-  // Hash the password before saving it to the database
-  bcrypt.hash(newAdmin.password, 10, (err, hashedPassword) => {
+  dbConn.query("INSERT INTO admin SET ?", newAdmin, (err, res) => {
     if (err) {
       console.log("error: ", err);
       result(err, null);
     } else {
-      newAdmin.password = hashedPassword;
-      dbConn.query("INSERT INTO admin SET ?", newAdmin, (err, res) => {
-        if (err) {
-          console.log("error: ", err);
-          result(err, null);
-        } else {
-          result(null, res.insertId);
-        }
-      });
+      result(null, res.insertId);
     }
   });
 };
@@ -49,7 +40,6 @@ Admin.findAll = (result) => {
 };
 
 Admin.update = (username, admin, result) => {
-  // Hash the password before updating it in the database
   bcrypt.hash(admin.password, 10, (err, hashedPassword) => {
     if (err) {
       console.log("error: ", err);
@@ -78,6 +68,27 @@ Admin.delete = (username, result) => {
       result(err, null);
     } else {
       result(null, res);
+    }
+  });
+};
+
+exports.login = (req, res) => {
+  Admin.findById(req.body.username, async (err, data) => {
+    if (err) {
+      res.status(500).send({ message: "Error fetching data" });
+    } else if (data.length === 0) {
+      res.status(400).send({ message: "User not found" });
+    } else {
+      try {
+        const isMatch = await bcrypt.compare(req.body.password, data[0].password);
+        if (isMatch) {
+          res.json({ message: "Login successful" });
+        } else {
+          res.status(400).send({ message: "Incorrect password" });
+        }
+      } catch (error) {
+        res.status(500).send({ message: "Error during authentication" });
+      }
     }
   });
 };
