@@ -82,3 +82,17 @@ exports.delete = (req, res) => {
     }
   });
 };
+
+exports.checkUsername = (req, res) => {
+  Admin.findById(req.query.username, (err, data) => {
+    if (err) {
+      return res.status(500).send({ message: "Error fetching data" });
+    }
+
+    if (data.length > 0) {
+      return res.status(200).send({ exists: true });
+    } else {
+      return res.status(200).send({ exists: false });
+    }
+  });
+};
