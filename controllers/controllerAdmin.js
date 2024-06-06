@@ -47,20 +47,20 @@ exports.create = async (req, res) => {
       password: hashedPassword,
     });
 
-  if (req.body.constructor === Object && Object.keys(req.body).length === 0) {
-    res.status(400).send({ message: "Please provide all required fields" });
-  } else {
-    Admin.create(newAdmin, (err, data) => {
-      if (err) {
-        res.status(500).send({ message: "Error creating data" });
-      } else {
-        res.json({ message: "Admin added successfully", data });
-      }
-    });
+    if (req.body.constructor === Object && Object.keys(req.body).length === 0) {
+      res.status(400).send({ message: "Please provide all required fields" });
+    } else {
+      Admin.create(newAdmin, (err, data) => {
+        if (err) {
+          res.status(500).send({ message: "Error creating data" });
+        } else {
+          res.json({ message: "Admin added successfully", data });
+        }
+      });
+    }
+  } catch (error) {
+    res.status(500).send({ message: "Error creating data" });
   }
-} catch (error) {
-  res.status(500).send({ message: "Error creating data" });
-}
 };
 
 exports.findAll = (req, res) => {
@@ -82,3 +82,19 @@ exports.delete = (req, res) => {
     }
   });
 };
+
+exports.checkUsername = (req, res) => {
+  Admin.findById(req.query.username, (err, data) => {
+    if (err) {
+      return res.status(500).send({ message: "Error fetching data" });
+    }
+
+    if (data.length > 0) {
+      return res.status(200).send({ exists: true });
+    } else {
+      return res.status(200).send({ exists: false });
+    }
+  });
+};
+
+module.exports = Admin;
