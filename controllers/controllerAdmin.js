@@ -39,28 +39,41 @@ exports.findById = (req, res) => {
 };
 
 exports.create = async (req, res) => {
-  const newAdmin = new Admin(req.body);
   try {
+    const usernameExists = await new Promise((resolve, reject) => {
+      Admin.findById(req.body.username, (err, data) => {
+        if (err) {
+          reject(err);
+        } else {
+          resolve(data.length > 0);
+        }
+      });
+    });
+
+    if (usernameExists) {
+      return res.status(400).send({ message: "Username already exists" });
+    }
+
     const hashedPassword = await bcrypt.hash(req.body.password, 10);
     const newAdmin = new Admin({
       username: req.body.username,
       password: hashedPassword,
     });
 
-  if (req.body.constructor === Object && Object.keys(req.body).length === 0) {
-    res.status(400).send({ message: "Please provide all required fields" });
-  } else {
-    Admin.create(newAdmin, (err, data) => {
-      if (err) {
-        res.status(500).send({ message: "Error creating data" });
-      } else {
-        res.json({ message: "Admin added successfully", data });
-      }
-    });
+    if (req.body.constructor === Object && Object.keys(req.body).length === 0) {
+      res.status(400).send({ message: "Please provide all required fields" });
+    } else {
+      Admin.create(newAdmin, (err, data) => {
+        if (err) {
+          res.status(500).send({ message: "Error creating data" });
+        } else {
+          res.json({ message: "Admin added successfully", data });
+        }
+      });
+    }
+  } catch (error) {
+    res.status(500).send({ message: "Error creating data" });
   }
-} catch (error) {
-  res.status(500).send({ message: "Error creating data" });
-}
 };
 
 exports.findAll = (req, res) => {
