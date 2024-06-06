@@ -47,20 +47,20 @@ exports.create = async (req, res) => {
       password: hashedPassword,
     });
 
-    if (req.body.constructor === Object && Object.keys(req.body).length === 0) {
-      res.status(400).send({ message: "Please provide all required fields" });
-    } else {
-      Admin.create(newAdmin, (err, data) => {
-        if (err) {
-          res.status(500).send({ message: "Error creating data" });
-        } else {
-          res.json({ message: "Admin added successfully", data });
-        }
-      });
-    }
-  } catch (error) {
-    res.status(500).send({ message: "Error creating data" });
+  if (req.body.constructor === Object && Object.keys(req.body).length === 0) {
+    res.status(400).send({ message: "Please provide all required fields" });
+  } else {
+    Admin.create(newAdmin, (err, data) => {
+      if (err) {
+        res.status(500).send({ message: "Error creating data" });
+      } else {
+        res.json({ message: "Admin added successfully", data });
+      }
+    });
   }
+} catch (error) {
+  res.status(500).send({ message: "Error creating data" });
+}
 };
 
 exports.findAll = (req, res) => {
@@ -82,5 +82,3 @@ exports.delete = (req, res) => {
     }
   });
 };
-
-module.exports = Admin;
